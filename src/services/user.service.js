@@ -31,3 +31,7 @@ export const loginUser = async(email,password) => {
 
     return existingUser;
 }
+
+export const getUserById = async (id) => {
+    return userRepository.getById(id)
+}
