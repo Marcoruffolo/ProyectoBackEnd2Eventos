@@ -3,6 +3,7 @@ import { UserDTO } from "../dto/user.dto.js";
 import { AppError }  from "../utils/AppError.js";
 import { generateToken } from "../utils/jwt.js";
 
+
 export const register = (req, res, next) => {
     passport.authenticate("register", { session : false } , (err, user, info) => {
         if(err){
@@ -55,3 +56,4 @@ export const logout = (req, res, next) => {
     res.clearCookie("token")
     res.status(200).json({ status: "success", message: "Sesión cerrada"})
 }
+

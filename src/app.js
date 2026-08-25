@@ -5,6 +5,7 @@ import "./config/passport.js"
 import passport from "passport";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import sessionRouter from "./routes/session.router.js"
+import eventRouter from "./routes/event.router.js";
 
 connectDB();
 const app = express();
@@ -24,6 +25,7 @@ app.get("/",(req,res) =>{
 const PORT = process.env.PORT
 
 app.use("/api/sessions",sessionRouter)
+app.use("/api/events",eventRouter)
 
 app.use(errorHandler);
 
