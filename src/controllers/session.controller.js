@@ -36,4 +36,22 @@ export const login = (req, res, next) => {
         })
 
         res.status(200).json({ status: "success", payload: UserDTO(user)})
-    })(req, res, next)}
+    })(req, res, next)
+}
+
+export const current = (req, res, next) => {
+    passport.authenticate("current", { session: false } , (err, user, info) => {
+        if(err){
+            return next(err)
+        }
+        if(!user){
+            return next(new AppError("No autenticado",401))
+        }
+        res.status(200).json({ status: "success", payload: UserDTO(user)})
+    })(req, res, next)
+}
+
+export const logout = (req, res, next) => {
+    res.clearCookie("token")
+    res.status(200).json({ status: "success", message: "Sesión cerrada"})
+}
