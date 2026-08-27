@@ -68,3 +68,51 @@ export const getEvents = async(query) => {
 
     return { events, page, limit, total, totalPages }
 }
+
+export const getEventById = async (id) => {
+    const event = await eventRepository.getById(id)
+
+    if(!event){
+        throw new AppError("Evento no encontrado",404)
+    }
+    return event
+}
+
+const checkEvent = (event, user ) => {
+    if(event.organizer.toString() !== user.id && user.role !== "admin"){
+        throw new AppError("El usuario no tiene los permisos necesarios",403)
+    }
+    if(event.status === "cancelled"){
+        throw new AppError("No se puede modificar un evento cancelado",400)
+    }
+}
+
+export const updateEvent = async (id, data, user) => {
+    const event = await getEventById(id)
+    checkEvent(event, user)
+    if(data.date && new Date(data.date) < new Date()){
+        throw new AppError("no se puede modificar un evento con fecha pasada",400)
+    }
+    if(data.capacity <=  0 && data.capacity !== undefined){
+        throw new AppError("Error de capacidad inválida",400)
+    }
+    if(data.price < 0 && data.price !== undefined){
+        throw new AppError("Error de precio inválido",400)
+    }
+
+    const updatedEvent = await eventRepository.updateById(id, data)
+    return updatedEvent
+}
+
+export const updateEventStatus = async (id, status, user) => {
+    const event = await getEventById(id)
+    checkEvent(event, user)
+    const validStates = ["published", "cancelled", "draft", "finished"]
+    if(!validStates.includes(status)){
+        throw new AppError("estado no existente",400)
+    }
+
+    const updatedEvent = await eventRepository.updateById(id, { status })
+    return updatedEvent
+}
+

@@ -6,6 +6,10 @@ export const errorHandler = (err, req, res, next) => {
         return res.status(err.statusCode).json({ status: "error", message: err.message})
     }
 
+    if(err.name === "CastError"){
+        return res.status(400).json({ status: "error", message: "Id inválido" })
+    }
+
     console.error(err)
 
     return res.status(500).json({ status: "error", message: "Error interno del servidor" })
