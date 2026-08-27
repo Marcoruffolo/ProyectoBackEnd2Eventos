@@ -12,4 +12,12 @@ export class EventDAO{
     async updateById(id, data){
         return EventModel.findByIdAndUpdate(id, data, {new: true})
     }
+
+    async getAll(filter, skip, limit, sort){
+        return EventModel.find(filter).skip(skip).limit(limit).sort(sort)
+    }
+
+    async count(filter){
+        return EventModel.countDocuments(filter)
+    }
 }

@@ -14,4 +14,12 @@ export class EventRepository{
     async updateById(id, data){
         return this.dao.updateById(id, data)
     }
+
+    async getAll(filter, skip, limit, sort){
+        return this.dao.getAll(filter, skip, limit, sort)
+    }
+
+    async count(filter){
+        return this.dao.count(filter)
+    }
 }

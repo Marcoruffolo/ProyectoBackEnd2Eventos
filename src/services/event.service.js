@@ -20,3 +20,51 @@ export const createEvent = async(eventData, organizerId) => {
 
     return event
 }
+
+export const getEvents = async(query) => {
+    let page = 1
+    if(query.page){
+        page = Number(query.page)
+    }
+    let limit = 10
+    if(query.limit){
+        limit = Number(query.limit)
+    }
+
+    let skip = (page - 1) * limit 
+    const filter = {}
+    if(query.category){
+        filter.category = query.category
+    }
+    if(query.status){
+        filter.status = query.status
+    }
+    if(query.location){
+        filter.location = query.location
+    }
+
+    if(query.dateFrom || query.dateTo){
+        filter.date = {}
+
+        if(query.dateFrom){
+            filter.date.$gte = new Date(query.dateFrom)
+        }
+        if(query.dateTo){
+            filter.date.$lte = new Date(query.dateTo)
+        }
+    }
+
+    let sort = { date : 1 } 
+    if(query.sortBy){
+        sort = {}
+        sort[query.sortBy] = query.order === "desc" ? -1 : 1
+    }
+
+    const events = await eventRepository.getAll(filter, skip, limit, sort)
+
+    const total = await eventRepository.count(filter)
+
+    const totalPages = Math.ceil(total / limit)
+
+    return { events, page, limit, total, totalPages }
+}
