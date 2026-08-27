@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createEvent, eventList, getEvent, updateEvent, updateEventStatus } from "../controllers/event.controller.js";
+import { createTicket, eventTickets } from "../controllers/ticket.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
 
@@ -9,4 +10,6 @@ router.get("/", eventList)
 router.get("/:id",getEvent)
 router.put("/:id",authenticate, updateEvent)
 router.patch("/:id/status", authenticate, updateEventStatus)
+router.post("/:eid/tickets", authenticate, createTicket)
+router.get("/:eid/tickets", authenticate, eventTickets)
 export default router
