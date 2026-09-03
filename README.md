@@ -1,10 +1,21 @@
 # Eventos API
 
-API backend para una plataforma de gestión de eventos: registro de usuarios, publicación de eventos, inscripción con control de cupo y notificación por email. Entrega final del curso de Backend de Coderhouse — evolución de las pre-entregas anteriores, con arquitectura profesional por capas.
+API REST para una plataforma de gestión de eventos, construida con Node.js y Express siguiendo una arquitectura por capas (routes → controllers → services → repositories → DAO → models). Cubre autenticación con JWT, autorización basada en roles, CRUD de eventos con filtros/paginación, y un sistema de inscripciones con control de cupo y notificación por email.
 
-## Temática
+Frontend (React + Vite): _en construcción — link próximamente_.
+
+## Qué resuelve
 
 Cualquier usuario puede registrarse y explorar eventos publicados. Los `organizer` crean y administran sus propios eventos (capacidad, precio, estado). Los usuarios se inscriben a eventos publicados mientras haya cupo disponible, reciben un email de confirmación con su código de reserva, y pueden cancelar su inscripción cuando quieran (liberando el cupo para otra persona). Los `admin` tienen visibilidad y permisos totales sobre eventos y tickets.
+
+## Highlights técnicos
+
+- **Autenticación y autorización real**: Passport (`local` + `jwt`), JWT en cookie httpOnly, passwords hasheadas con bcrypt, middleware de roles reforzado a nivel de ruta.
+- **Arquitectura por capas** con responsabilidad única en cada una (ver detalle abajo) — no hay lógica de negocio en controllers, ni Mongoose fuera del DAO.
+- **DTOs** que garantizan que ningún endpoint exponga datos sensibles (passwords nunca salen de la API, ni en la respuesta ni en el JWT).
+- **Manejo de errores centralizado** con códigos HTTP correctos (400/401/403/404/409/500), incluyendo validación de `ObjectId` malformados.
+- **Tests automatizados** con Jest + Supertest + `mongodb-memory-server`: unitarios sobre la capa de servicios y de integración sobre los endpoints críticos (auth, autorización).
+- **Reglas de negocio con casos borde cubiertos**: cupo, inscripción duplicada, cancelación sin borrado, envío de email "best effort" (no bloquea la respuesta si falla el SMTP).
 
 ## Tecnologías
 
@@ -87,6 +98,18 @@ Como el registro público solo permite `user`, para probar los roles superiores 
 |---|---|
 | `npm run dev` | Levanta el servidor con nodemon (recarga automática) |
 | `npm start` | Levanta el servidor con node |
+| `npm test` | Corre la suite de tests (Jest) |
+
+## Tests
+
+```bash
+npm test
+```
+
+- **Unitarios** (`tests/unit`): prueban la capa de servicios de forma aislada — reglas de negocio como que el registro público siempre asigna el rol `user`, o que no se puede registrar dos veces el mismo email.
+- **Integración** (`tests/integration`): prueban el flujo HTTP completo contra la app (routes → middlewares → controllers → services → DB), incluyendo el manejo de la cookie de sesión (registro → login → `/current`) y el rechazo de credenciales inválidas (`401`).
+
+Corren contra una instancia de MongoDB en memoria (`mongodb-memory-server`), sin depender de una base real ni de datos previos.
 
 ## Endpoints
 
