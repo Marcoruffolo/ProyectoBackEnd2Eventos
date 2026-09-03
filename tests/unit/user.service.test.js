@@ -25,3 +25,4 @@ test("email ya existente", async () => {
     await expect(registerUser({ first_name: "brad", last_name : "jackson", email : "jamesjackson@gmail.com", password : "2485"})).rejects.toThrow("Ya existe un usuario con ese email")
 })
 
+
